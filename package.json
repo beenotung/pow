@@ -1,6 +1,6 @@
 {
   "name": "@beenotung/pow",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Cross platform proof-of-work (POW) typescript library",
   "keywords": [
     "POW",
