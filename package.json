@@ -1,13 +1,16 @@
 {
-  "name": "pow",
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "author": {
-    "name": "Beeno Tung",
-    "email": "aabbcc1241@yahoo.com.hk",
-    "url": "https://beeno-tung.surge.sh"
-  },
+  "name": "@beenotung/pow",
+  "version": "0.0.0",
+  "description": "Cross platform proof-of-work (POW) typescript library",
+  "keywords": [
+    "POW",
+    "Proof-of-work",
+    "typescript",
+    "spam",
+    "abuse",
+    "security"
+  ],
+  "author": "Beeno Tung <aabbcc1241@yahoo.com.hk> (https://beeno-tung.surge.sh)",
   "license": "BSD-2-Clause",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,17 +33,28 @@
   "directories": {
     "test": "test"
   },
-  "dependencies": {
-    "@beenotung/tslib": "^14.33.1"
-  },
   "devDependencies": {
+    "@beenotung/tslib": "^14.33.1",
+    "@types/crypto-js": "^3.1.43",
     "@types/node": "*",
     "husky": "^3.0.4",
     "prettier": "^1.18.2",
     "rimraf": "^3.0.0",
     "ts-node": "^8.3.0",
     "tslint": "^5.19.0",
+    "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.5.3"
-  }
+  },
+  "dependencies": {
+    "crypto-js": "^3.1.9-1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/pow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/beenotung/pow/issues"
+  },
+  "homepage": "https://github.com/beenotung/pow#readme"
 }

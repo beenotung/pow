@@ -5,6 +5,8 @@
     "tslint-config-prettier"
   ],
   "rules": {
+    "no-bitwise": false,
+    "prefer-for-of": false,
     "interface-over-type-literal": false,
     "no-reference": true,
     "only-arrow-functions": false,
@@ -51,7 +53,6 @@
       "variables-before-functions"
     ],
     "no-arg": true,
-    "no-bitwise": true,
     "no-console": [
       true,
       "debug",
