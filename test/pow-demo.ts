@@ -21,10 +21,13 @@ console.log = function(...args: any[]) {
   }
 };
 
-// let difficulty = 1e-12;
+/**
+ * this is the difficulty for node.js server
+ * for desktop, should be halved
+ * for mobile, should be further halved
+ * */
 let difficulty_hex =
   'ffffe47fc9b3f066140a24334f1481c87d74a35d1c907439a7daceafc9666675';
-let message = 'hi';
 let target_duration = 5 * SECOND;
 
 function difficulty_needed(args: {
@@ -86,11 +89,8 @@ function update_acc_elapsed(elapsed: number, alpha = 0.5) {
 let step = 0.000001;
 
 function loop() {
-  message = new Date().toString();
-  console.log('target:', {
-    // difficulty,
-    hex: difficulty_hex,
-  });
+  let message = new Date().toString();
+  console.log('target:', difficulty_hex);
   setTimeout(() => {
     let res = gen_pow({
       message,
@@ -126,11 +126,18 @@ function loop() {
           elapsed,
           difficulty_hex,
         ]);
-        console.log({
-          records,
-          average_elapsed,
-          average_difficulty_hex,
-        });
+        if (typeof window === 'undefined') {
+          console.log({
+            records,
+            average_elapsed,
+            average_difficulty_hex,
+          });
+        } else {
+          console.log({
+            average_elapsed,
+            average_difficulty_hex,
+          });
+        }
         difficulty_hex = average_difficulty_hex;
       } else if (elapsed === target_duration) {
         // right timing
