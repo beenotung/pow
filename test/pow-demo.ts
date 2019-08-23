@@ -125,7 +125,7 @@ function loop() {
         'acc_elapsed_rate:',
         acc_elapsed_rate,
       );
-      if (Math.abs(elapsed - target_duration) < target_duration) {
+      if (Math.abs(elapsed - target_duration) < (target_duration * 2) / 3) {
         let { average_difficulty_hex, average_elapsed } = average_difficulty([
           elapsed,
           difficulty_hex,
