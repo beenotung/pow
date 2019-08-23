@@ -28,6 +28,17 @@ console.log = function(...args: any[]) {
  * */
 let difficulty_hex =
   'ffffe47fc9b3f066140a24334f1481c87d74a35d1c907439a7daceafc9666675';
+if (typeof window !== 'undefined') {
+  difficulty_hex = hex_multiply(difficulty_hex, 0.5);
+  let userAgent = navigator.userAgent.toLowerCase();
+  if (
+    userAgent.includes('android') ||
+    userAgent.includes('iphone') ||
+    userAgent.includes('mobi')
+  ) {
+    difficulty_hex = hex_multiply(difficulty_hex, 0.5);
+  }
+}
 let target_duration = 5 * SECOND;
 
 function difficulty_needed(args: {
