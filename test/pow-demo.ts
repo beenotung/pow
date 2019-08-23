@@ -23,21 +23,14 @@ console.log = function(...args: any[]) {
 
 /**
  * this is the difficulty for node.js server
- * for desktop, should be halved
- * for mobile, should be further halved
+ * for desktop, hps is halved
+ * for mobile, hps is further halved
  * */
 let difficulty_hex =
   'ffffe47fc9b3f066140a24334f1481c87d74a35d1c907439a7daceafc9666675';
 if (typeof window !== 'undefined') {
-  difficulty_hex = hex_multiply(difficulty_hex, 0.5);
-  let userAgent = navigator.userAgent.toLowerCase();
-  if (
-    userAgent.includes('android') ||
-    userAgent.includes('iphone') ||
-    userAgent.includes('mobi')
-  ) {
-    difficulty_hex = hex_multiply(difficulty_hex, 0.5);
-  }
+  difficulty_hex =
+    'fffee47fc9b3f066140a24334f1481c87d74a35d1c907439a7daceafc9666675';
 }
 let target_duration = 5 * SECOND;
 
@@ -157,7 +150,11 @@ function loop() {
         difficulty_hex = hex_multiply(difficulty_hex, 1 - step);
       } else {
         // to fast
-        difficulty_hex = hex_multiply(difficulty_hex, 1 + step);
+        if (nonce === 0) {
+          difficulty_hex = hex_multiply(difficulty_hex, 1.1);
+        } else {
+          difficulty_hex = hex_multiply(difficulty_hex, 1 + step);
+        }
       }
     }
     setTimeout(loop);

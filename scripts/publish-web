@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 set -o pipefail
-parcel build test/pow-demo.html
 rm -rf dist
-mkdir -p dist
+parcel build test/pow-demo.html
 cd dist
-ln -sf pow-demo.html index.html
+ln -s pow-demo.html index.html
 surge . https://pow-demo.surge.sh/
