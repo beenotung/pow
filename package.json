@@ -21,6 +21,7 @@
     "postformat": "tslint -p . --fix",
     "prebuild": "npm run clean",
     "build": "tsc",
+    "postbuild": "node mk-package.js > dist/package.json",
     "pretest": "npm run format && npm run build",
     "rawtest": "ts-node test/index.ts",
     "prepublishOnly": "npm run rawtest && npm run build"
