@@ -2,6 +2,8 @@
 set -e
 set -o pipefail
 parcel build test/pow-demo.html
+rm -rf dist
+mkdir -p dist
 cd dist
 ln -sf pow-demo.html index.html
 surge . https://pow-demo.surge.sh/
