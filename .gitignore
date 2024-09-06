@@ -6,3 +6,10 @@ pnpm-debug.log
 dist/
 .cache/
 *.tgz
+*-lock.json
+*-lock.yaml
+*.lock
+.*-debug.log
+*.tsbuildinfo
+.env
+.DS_Store

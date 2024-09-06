@@ -1,1 +1,2 @@
-export * from './pow';
+export * from './pow'
+export * from './hash'

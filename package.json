@@ -15,40 +15,22 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "npm run rawtest",
-    "clean": "rimraf node_modules/@beenotung/tslib/index.* dist",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "postformat": "tslint -p . --fix",
-    "prebuild": "npm run clean",
-    "build": "tsc",
-    "postbuild": "node mk-package.js > dist/package.json",
-    "pretest": "npm run format && npm run build",
-    "rawtest": "ts-node test/index.ts",
-    "prepublishOnly": "npm run rawtest && npm run build"
-  },
-  "husky": {
-    "hook": {
-      "pre-commit": "npm run format"
-    }
+    "test": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "build": "rimraf dist && tsc -p . && rimraf dist/tsconfig.tsbuildinfo",
+    "tsc": "tsc -p .",
+    "bundle": "esbuild --bundle src/hash.ts --outfile=bundle.js"
   },
   "directories": {
     "test": "test"
   },
   "devDependencies": {
-    "@beenotung/tslib": "^14.33.1",
-    "@types/crypto-js": "^3.1.43",
-    "@types/node": "*",
-    "husky": "^3.0.4",
-    "prettier": "^1.18.2",
-    "rimraf": "^3.0.0",
-    "ts-node": "^8.3.0",
-    "tslint": "^5.19.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.5.3"
-  },
-  "dependencies": {
-    "crypto-js": "^3.1.9-1"
+    "@types/node": "^22.5.4",
+    "esbuild": "^0.23.1",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4"
   },
   "repository": {
     "type": "git",
@@ -57,5 +39,8 @@
   "bugs": {
     "url": "https://github.com/beenotung/pow/issues"
   },
-  "homepage": "https://github.com/beenotung/pow#readme"
+  "homepage": "https://github.com/beenotung/pow#readme",
+  "files": [
+    "dist"
+  ]
 }

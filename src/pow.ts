@@ -1,207 +1,123 @@
-import { enc, SHA256 } from 'crypto-js';
+import { hash_string } from './hash'
 
-function to_string(x: any): string {
+export function to_string(x: any): string {
   if (typeof x === 'string') {
-    return x;
+    return x
   }
-  const s = JSON.stringify(x);
+  let s = JSON.stringify(x)
   if (s !== '{}') {
-    return s;
+    return s
   }
-  return x.toString();
+  return x.toString()
 }
 
-/**
- * @return hex string of 64 chars
- * */
-function hash_with_nonce(args: { message: any; nonce: number }): string {
-  const s: string = to_string(args.message) + args.nonce;
-  return SHA256(s).toString(enc.Hex);
-}
+const full_difficulty_hex = '1' + '0'.repeat(64)
+const max_difficulty_hex = 'f'.repeat(64)
+const max_difficulty_num = Math.pow(16, 64)
 
 /**
  * @param difficulty: real number, range from 0 (easiest) to 1 (hardest)
  * @return hex string of 64 chars
- * the has of pow should be larger than or equal to the result hex
+ * the hash of pow should be larger than or equal to the result hex
  * */
 export function difficulty_to_hex(difficulty: number): string {
-  let hex = (Math.pow(16, 64) * difficulty).toString(16);
-  hex = hex.split('.')[0];
-  if (hex === '1' + '0'.repeat(64)) {
-    return 'f'.repeat(64);
-  }
-  if (hex.length > 64 || hex.startsWith('-')) {
-    console.error('hex out of range:', {
+  if (difficulty < 0 || difficulty > 1) {
+    console.error('difficulty out of range:', {
       difficulty,
-      hex,
-      len: hex.length,
-    });
-    throw new Error('out of range');
+    })
+    throw new Error('out of range')
+  }
+  let hex = (max_difficulty_num * difficulty).toString(16)
+  hex = hex.split('.')[0]
+  if (hex == full_difficulty_hex) {
+    return max_difficulty_hex
   }
   if (hex.length !== 64) {
-    hex = '0'.repeat(64 - hex.length) + hex;
+    hex = '0'.repeat(64 - hex.length) + hex
   }
-  return hex;
+  return hex
 }
 
-function is_hash_meet_difficulty(
-  hash: string,
-  difficulty_hex: string,
-): boolean {
-  if (difficulty_hex.length !== 64 || hash.length !== 64) {
-    throw new Error('invalid hex length');
+export function difficulty_from_hex(difficulty_hex: string): number {
+  if (difficulty_hex.length !== 64) {
+    console.error('invalid difficulty_hex:', { difficulty_hex })
+    throw new Error('invalid difficulty_hex')
   }
-  for (let i = 0; i < 64; i++) {
-    const difficulty_char = difficulty_hex[i];
-    const hash_char = hash[i];
-    if (difficulty_char === hash_char) {
-      continue;
-    }
-    return difficulty_char < hash_char;
+  let difficulty = parseInt(difficulty_hex, 16) / max_difficulty_num
+  if (difficulty < 0 || difficulty > 1) {
+    console.error('difficulty_hex out of range:', {
+      difficulty_hex,
+      difficulty,
+    })
+    throw new Error('out of range')
   }
-  return true;
-}
-
-const hex_to_decimal: { [hex: string]: number } = {};
-const decimal_to_hex: { [decimal: number]: string } = {};
-for (let i = 0; i < 10; i++) {
-  hex_to_decimal[i] = i;
-  decimal_to_hex[i] = i.toString();
-}
-for (let i = 0; i < 6; i++) {
-  const h = String.fromCharCode(65 + 32 + i);
-  const d = 10 + i;
-  hex_to_decimal[h] = d;
-  decimal_to_hex[d] = h;
-}
-
-export function ensure_hex_length(hex: string, length: number): string {
-  if (hex.length < length) {
-    hex = '0'.repeat(length - hex.length) + hex;
-  }
-  return hex;
-}
-
-export function hex_to_decimals(hex: string): number[] {
-  const xs = new Array(hex.length);
-  for (let i = 0; i < hex.length; i++) {
-    xs[i] = hex_to_decimal[hex[i]];
-  }
-  return xs;
-}
-
-export function decimals_to_hex(decimals: number[]): string {
-  // clean up decimal
-  for (let i = 0; i < decimals.length; i++) {
-    const x = decimals[i];
-    const d = Math.floor(x);
-    if (x !== d) {
-      if (i + 1 < decimals.length) {
-        decimals[i + 1] += (x * 16) % 16;
-      }
-      decimals[i] = d;
-    }
-  }
-  // clean up overflow
-  for (let i = decimals.length - 1; i >= 0; i--) {
-    let x = decimals[i];
-    if (x >= 16) {
-      const new_x = x % 16;
-      decimals[i - 1] += (x - new_x) / 16;
-      x = new_x;
-    }
-    decimals[i] = x;
-  }
-  if (typeof decimals[-1] === 'number') {
-    return 'f'.repeat(decimals.length);
-  }
-  let hex = '';
-  for (let i = 0; i < decimals.length; i++) {
-    hex += decimal_to_hex[decimals[i]];
-  }
-  return hex;
-}
-
-/**
- * @param hex string of 64 chars
- * @param amount to be added, must be positive
- * @return hex string of 64 chars
- *
- * if overflow, will be rounded as 'f' x 64
- * */
-export function hex_add(hex: string, amount: number): string {
-  const decimals = hex_to_decimals(hex);
-  for (let factor = 1; factor <= decimals.length; factor++) {
-    decimals[decimals.length - factor] += amount % 16;
-    amount = amount >> 4;
-  }
-  return decimals_to_hex(decimals);
-}
-
-/**
- * @param hex string of 64 chars
- * @param times factor to be multiplied, must be positive
- * @return hex string of 64 chars
- *
- * if overflow, will be rounded as 'f' x 64
- * */
-export function hex_multiply(hex: string, times: number): string {
-  const decimals = hex_to_decimals(hex);
-  // do multiply
-  for (let i = 0; i < decimals.length; i++) {
-    decimals[i] *= times;
-  }
-  return decimals_to_hex(decimals);
+  return difficulty
 }
 
 /**
  * @param args.message: the message to be used to do pow
- * @param args.difficulty: real number, range from 0 (easiest) to 1 (hardest)
- * @return {pow} hex string of 64 chars
- * @return {nonce} the nonce used in the pow
+ * @param args.difficulty_hex: result hash should be larger than or equal to difficulty_hex
+ * @param args.max_duration: timeout duration in ms, will terminate early if timeout
+ * @return hash: hex string of 64 chars in lower case
+ * @return nonce: the nonce used in the pow
+ * @return elapsed: the ms passed during gen_pow()
  * */
-export function gen_pow(args: {
-  message: any;
-  difficulty_hex: string;
-  max_duration: number;
-}):
+export async function gen_pow(args: {
+  message: string
+  difficulty_hex: string
+  max_duration: number
+}): Promise<
   | {
-      success: true;
-      nonce: number;
-      elapsed: number;
+      success: true
+      nonce: number
+      hash: string
+      elapsed: number
     }
   | {
-      success: false;
-      reason: 'timeout';
-    } {
-  const { message, difficulty_hex, max_duration } = args;
-  if (difficulty_hex === 'f'.repeat(difficulty_hex.length)) {
-    return { success: false, reason: 'timeout' };
+      success: false
+      reason: 'timeout'
+      nonce: number
+      elapsed: number
+    }
+> {
+  let { message, difficulty_hex, max_duration } = args
+  if (difficulty_hex.length !== 64) {
+    console.error('invalid difficulty_hex:', { difficulty_hex })
+    throw new Error('invalid difficulty_hex')
   }
-  let nonce = 0;
-  const start = Date.now();
+  let nonce = 0
+  let start = Date.now()
+  if (difficulty_hex === 'f'.repeat(difficulty_hex.length)) {
+    let elapsed = Date.now() - start
+    return { success: false, reason: 'timeout', nonce, elapsed }
+  }
   for (;;) {
-    const elapsed = Date.now() - start;
+    let elapsed = Date.now() - start
     if (elapsed > max_duration) {
-      return { success: false, reason: 'timeout' };
+      return { success: false, reason: 'timeout', nonce, elapsed }
     }
-    const hash = hash_with_nonce({ message, nonce });
-    if (is_hash_meet_difficulty(hash, difficulty_hex)) {
-      return { success: true, nonce, elapsed };
+    let hash = await hash_string(`${nonce}:${message}`)
+    if (hash >= difficulty_hex) {
+      return { success: true, hash, nonce, elapsed }
     }
-    nonce++;
+    nonce++
   }
 }
 
-export function verify_pow(args: {
-  nonce: number;
-  difficultyHex: string;
-  message: any;
-}): boolean {
-  const hash = hash_with_nonce({
-    message: args.message,
-    nonce: args.nonce,
-  });
-  const difficultyHex = args.difficultyHex;
-  return is_hash_meet_difficulty(hash, difficultyHex);
+/**
+ * @param args.nonce: the nonce used in the pow
+ * @param args.difficulty_hex: result hash should be larger than or equal to difficulty_hex
+ * @param args.message: the message to be used to do pow
+ * @return boolean if it pass the pow difficulty requirement
+ * */
+export async function verify_pow(args: {
+  nonce: number
+  difficulty_hex: string
+  message: string
+}): Promise<boolean> {
+  if (args.difficulty_hex.length !== 64) {
+    throw new Error('invalid hex length')
+  }
+  let hash = await hash_string(`${args.nonce}:${args.message}`)
+  return hash >= args.difficulty_hex
 }
