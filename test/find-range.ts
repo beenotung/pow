@@ -10,7 +10,7 @@ async function main() {
   let difficulty = 0.999996
   let step = 0.0000001
   for (;;) {
-    let message = `${Date.now()}:demo@example.net`
+    let message = `${performance.now()}:demo@example.net`
     let difficulty_hex = difficulty_to_hex(difficulty)
     let result = await gen_pow({
       message,
