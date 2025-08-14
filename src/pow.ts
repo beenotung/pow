@@ -86,13 +86,13 @@ export async function gen_pow(args: {
     throw new Error('invalid difficulty_hex')
   }
   let nonce = 0
-  let start = Date.now()
+  let start = performance.now()
   if (difficulty_hex === 'f'.repeat(difficulty_hex.length)) {
-    let elapsed = Date.now() - start
+    let elapsed = performance.now() - start
     return { success: false, reason: 'timeout', nonce, elapsed }
   }
   for (;;) {
-    let elapsed = Date.now() - start
+    let elapsed = performance.now() - start
     if (elapsed > max_duration) {
       return { success: false, reason: 'timeout', nonce, elapsed }
     }
