@@ -25,12 +25,12 @@
     "test": "test"
   },
   "devDependencies": {
-    "@types/node": "^22.5.4",
-    "esbuild": "^0.23.1",
+    "@types/node": "^22.17.1",
+    "esbuild": "^0.25.9",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.9.2"
   },
   "repository": {
     "type": "git",
